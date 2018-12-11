@@ -368,5 +368,37 @@ int DLGpuMatrixMultiply(const DLArrayHandle matA, bool transposeA,
   /* TODO: Your code here */
   // Hint: use cublas
   // cublas assume matrix is column major
+    int arow = matA->shape[1];
+    int acol = matA->shape[0];
+    int brow = matB->shape[1];
+    int bcol = matB->shape[0];
+    int crow = matC->shape[1];
+    int ccol = matC->shape[0];
+
+    cublasHandle_t handle;
+    cublasCreate(&handle);
+    const float a = 1.0f;
+    const float b = 0.0f;
+    if(transposeA){
+        if(transposeB){
+            // C = A^T * B^T, C^T = B * A
+            cublasSgemm(handle, CUBLAS_OP_T, CUBLAS_OP_T, bcol, arow, brow, &a, (float *)matB->data, brow, (float *)matA->data, arow, &b, (float *)matC->data, bcol);
+        }
+        else{
+            // C = A^T * B, C^T = B^T * A
+            cublasSgemm(handle, CUBLAS_OP_N, CUBLAS_OP_T, brow, arow, bcol, &a, (float *)matB->data, brow, (float *)matA->data, arow, &b, (float *)matC->data, brow);
+        }
+    }
+    else{
+        if(transposeB){
+            // C^T = A * B^T, C = B*A^T
+            cublasSgemm(handle, CUBLAS_OP_T, CUBLAS_OP_N, bcol, acol, brow, &a, (float *)matB->data, brow, (float *)matA->data, arow, &b, (float *)matC->data, bcol);
+        }
+        else{
+            // C = A * B, C^T = B^T * A^T
+            cublasSgemm(handle, CUBLAS_OP_N, CUBLAS_OP_N, brow, acol, bcol, &a, (float *)matB->data, brow, (float *)matA->data, arow, &b, (float *)matC->data, brow);
+        }
+        
+    }
   return 0;
 }

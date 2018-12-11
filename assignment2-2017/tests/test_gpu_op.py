@@ -96,37 +96,6 @@ def test_matrix_elementwise_multiply_by_const():
     np.testing.assert_allclose(x * val, y, rtol=1e-5)
 
 
-def test_matrix_multiply():
-    ctx = ndarray.gpu(0)
-    x = np.random.uniform(0, 10, size=(500, 700)).astype(np.float32)
-    y = np.random.uniform(0, 10, size=(700, 1000)).astype(np.float32)
-    arr_x = ndarray.array(x, ctx=ctx)
-    arr_y = ndarray.array(y, ctx=ctx)
-    arr_z = ndarray.empty((500, 1000), ctx=ctx)
-    gpu_op.matrix_multiply(arr_x, False, arr_y, False, arr_z)
-    z = arr_z.asnumpy()
-    np.testing.assert_allclose(np.dot(x, y), z, rtol=1e-5)
-
-    x = np.random.uniform(0, 10, size=(1000, 500)).astype(np.float32)
-    y = np.random.uniform(0, 10, size=(2000, 500)).astype(np.float32)
-    arr_x = ndarray.array(x, ctx=ctx)
-    arr_y = ndarray.array(y, ctx=ctx)
-    arr_z = ndarray.empty((1000, 2000), ctx=ctx)
-    gpu_op.matrix_multiply(arr_x, False, arr_y, True, arr_z)
-    z = arr_z.asnumpy()
-    np.testing.assert_allclose(np.dot(x, np.transpose(y)), z, rtol=1e-5)
-    
-    x = np.random.uniform(0, 10, size=(500, 1000)).astype(np.float32)
-    y = np.random.uniform(0, 10, size=(2000, 500)).astype(np.float32)
-    arr_x = ndarray.array(x, ctx=ctx)
-    arr_y = ndarray.array(y, ctx=ctx)
-    arr_z = ndarray.empty((1000, 2000), ctx=ctx)
-    gpu_op.matrix_multiply(arr_x, True, arr_y, True, arr_z)
-    z = arr_z.asnumpy()
-    np.testing.assert_allclose(np.dot(np.transpose(x), np.transpose(y)), z,
-                               rtol=1e-5)
-
-
 def test_relu():
     shape = (2000, 2500)
     ctx = ndarray.gpu(0)
@@ -176,3 +145,44 @@ def test_softmax_cross_entropy():
     cross_entropy = np.mean(
         -np.sum(y_ * np.log(autodiff.softmax_func(y)), axis=1), keepdims=True)
     np.testing.assert_allclose(cross_entropy, out, rtol=1e-5)
+
+def test_matrix_multiply():
+    ctx = ndarray.gpu(0)
+    x = np.random.uniform(0, 10, size=(500, 700)).astype(np.float32)
+    y = np.random.uniform(0, 10, size=(700, 1000)).astype(np.float32)
+    arr_x = ndarray.array(x, ctx=ctx)
+    arr_y = ndarray.array(y, ctx=ctx)
+    arr_z = ndarray.empty((500, 1000), ctx=ctx)
+    gpu_op.matrix_multiply(arr_x, False, arr_y, False, arr_z)
+    z = arr_z.asnumpy()
+    np.testing.assert_allclose(np.dot(x, y), z, rtol=1e-5)
+
+    x = np.random.uniform(0, 10, size=(1000, 500)).astype(np.float32)
+    y = np.random.uniform(0, 10, size=(2000, 500)).astype(np.float32)
+    arr_x = ndarray.array(x, ctx=ctx)
+    arr_y = ndarray.array(y, ctx=ctx)
+    arr_z = ndarray.empty((1000, 2000), ctx=ctx)
+    gpu_op.matrix_multiply(arr_x, False, arr_y, True, arr_z)
+    z = arr_z.asnumpy()
+    np.testing.assert_allclose(np.dot(x, np.transpose(y)), z, rtol=1e-5)
+    
+    x = np.random.uniform(0, 10, size=(500, 1000)).astype(np.float32)
+    y = np.random.uniform(0, 10, size=(2000, 500)).astype(np.float32)
+    arr_x = ndarray.array(x, ctx=ctx)
+    arr_y = ndarray.array(y, ctx=ctx)
+    arr_z = ndarray.empty((1000, 2000), ctx=ctx)
+    gpu_op.matrix_multiply(arr_x, True, arr_y, True, arr_z)
+    z = arr_z.asnumpy()
+    np.testing.assert_allclose(np.dot(np.transpose(x), np.transpose(y)), z,
+                               rtol=1e-5)
+
+
+    x = np.random.uniform(0, 10, size=(500, 1000)).astype(np.float32)
+    y = np.random.uniform(0, 10, size=(500, 2000)).astype(np.float32)
+    arr_x = ndarray.array(x, ctx=ctx)
+    arr_y = ndarray.array(y, ctx=ctx)
+    arr_z = ndarray.empty((1000, 2000), ctx=ctx)
+    gpu_op.matrix_multiply(arr_x, True, arr_y, False, arr_z)
+    z = arr_z.asnumpy()
+    np.testing.assert_allclose(np.dot(np.transpose(x), y), z,
+                               rtol=1e-5)
