@@ -372,8 +372,8 @@ int DLGpuMatrixMultiply(const DLArrayHandle matA, bool transposeA,
     int acol = matA->shape[0];
     int brow = matB->shape[1];
     int bcol = matB->shape[0];
-    int crow = matC->shape[1];
-    int ccol = matC->shape[0];
+    // int crow = matC->shape[1];
+    // int ccol = matC->shape[0];
 
     cublasHandle_t handle;
     cublasCreate(&handle);

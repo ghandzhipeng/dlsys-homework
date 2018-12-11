@@ -481,7 +481,7 @@ class SoftmaxCrossEntropyOp(Op):
 
     def infer_shape(self, node, input_shapes):
         """TODO: Your code here"""
-        return input_shapes[1]
+        return (1,)
 
 
 class SoftmaxOp(Op):
@@ -631,6 +631,7 @@ class Executor(object):
         feed_shapes: node->shapes mapping for feed_dict nodes.
         """
         """TODO: Your code here"""
+        self.node_to_arr_map = {}
         for node in self.topo_order:
             if node in feed_shapes:
                 #skip this
